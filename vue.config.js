@@ -16,6 +16,8 @@ const name = defaultSettings.title || 'vue Admin Template' // page title
 const port = process.env.port || process.env.npm_config_port || 9528 // dev port
 
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
+// 替换路径名称
+const replacePath = '^' + process.env.VUE_APP_BASE_API
 module.exports = {
   /**
    * You will need to set publicPath if you plan to deploy your site under a sub path,
@@ -38,15 +40,14 @@ module.exports = {
     },
     //  这里要配置代理跨域问题
     proxy: {
-      '/dev-api': {
-        target: 'http://gmall-h5-api.atguigu.cn',
-        pathRewrite: { '^/dev-api': '' }
+      [process.env.VUE_APP_BASE_API]: {
+        target: process.env.VUE_APP_SERVER_PATH,
+        pathRewrite: { [replacePath]: '' }
       }
     },
     // 开启mock模拟数据
-    before:require('./mock/mock-server.js')
+    before: require('./mock/mock-server.js')
   },
-  
   
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
@@ -69,10 +70,10 @@ module.exports = {
         include: 'initial'
       }
     ])
-
+    
     // when there are many pages, it will cause too many meaningless requests
     config.plugins.delete('prefetch')
-
+    
     // set svg-sprite-loader
     config.module
       .rule('svg')
@@ -89,7 +90,7 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
-
+    
     config
       .when(process.env.NODE_ENV !== 'development',
         config => {
